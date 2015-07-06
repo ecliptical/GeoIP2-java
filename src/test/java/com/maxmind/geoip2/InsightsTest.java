@@ -1,9 +1,5 @@
 package com.maxmind.geoip2;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.List;
@@ -15,6 +11,8 @@ import com.google.api.client.http.HttpTransport;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.InsightsResponse;
 import com.maxmind.geoip2.record.*;
+
+import static org.junit.Assert.*;
 
 public class InsightsTest {
     private InsightsResponse insights;
@@ -33,7 +31,7 @@ public class InsightsTest {
     public void testSubdivisionsList() {
         List<Subdivision> subdivisionsList = this.insights.getSubdivisions();
         assertNotNull("city.getSubdivisionsList returns null", subdivisionsList);
-        if (subdivisionsList.size() == 0) {
+        if (subdivisionsList.isEmpty()) {
             fail("subdivisionsList is empty");
         }
         Subdivision subdivision = subdivisionsList.get(0);
@@ -49,6 +47,12 @@ public class InsightsTest {
     public void mostSpecificSubdivision() {
         assertEquals("Most specific subdivision returns last subdivision",
                 "TT", this.insights.getMostSpecificSubdivision().getIsoCode());
+    }
+
+    @Test
+    public void leastSpecificSubdivision() {
+    	assertEquals("Most specific subdivision returns first subdivision",
+    		"MN", this.insights.getLeastSpecificSubdivision().getIsoCode());
     }
 
     @SuppressWarnings("boxing")
@@ -67,10 +71,8 @@ public class InsightsTest {
                 "example.com", traits.getDomain());
         assertEquals("traits.getIpAddress() does not return 1.2.3.4",
                 "1.2.3.4", traits.getIpAddress());
-        assertEquals("traits.isAnonymousProxy() returns true", true,
-                traits.isAnonymousProxy());
-        assertEquals("traits.isSatelliteProvider() returns true", true,
-                traits.isSatelliteProvider());
+        assertTrue("traits.isAnonymousProxy() returns true", traits.isAnonymousProxy());
+        assertTrue("traits.isSatelliteProvider() returns true", traits.isSatelliteProvider());
         assertEquals("traits.getIsp() does not return Comcast", "Comcast",
                 traits.getIsp());
         assertEquals("traits.getOrganization() does not return Blorg", "Blorg",
@@ -86,6 +88,9 @@ public class InsightsTest {
 
         assertNotNull("city.getLocation() returns null", location);
 
+        assertEquals("location.getAverageIncome() does not return 24626,",
+                new Integer(24626), location.getAverageIncome());
+
         assertEquals("location.getAccuracyRadius() does not return 1500",
                 new Integer(1500), location.getAccuracyRadius());
 
@@ -97,6 +102,8 @@ public class InsightsTest {
                 93.2636, longitude, 0.1);
         assertEquals("location.getMetroCode() does not return 765",
                 new Integer(765), location.getMetroCode());
+        assertEquals("location.getPopulationDensity() does not return 1341,",
+                new Integer(1341), location.getPopulationDensity());
         assertEquals("location.getTimeZone() does not return America/Chicago",
                 "America/Chicago", location.getTimeZone());
     }

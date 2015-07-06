@@ -10,9 +10,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * This record is returned by all the end points except the Country end point.
  * </p>
  */
-final public class Location {
+public class Location {
     @JsonProperty("accuracy_radius")
     private Integer accuracyRadius;
+
+    @JsonProperty("average_income")
+    private Integer averageIncome;
 
     @JsonProperty
     private Double latitude;
@@ -23,11 +26,11 @@ final public class Location {
     @JsonProperty("metro_code")
     private Integer metroCode;
 
+    @JsonProperty("population_density")
+    private Integer populationDensity;
+
     @JsonProperty("time_zone")
     private String timeZone;
-
-    public Location() {
-    }
 
     /**
      * @return The radius in kilometers around the specified location where the
@@ -36,6 +39,14 @@ final public class Location {
      */
     public Integer getAccuracyRadius() {
         return this.accuracyRadius;
+    }
+
+    /**
+     * @return The average income in US dollars associated with the requested
+     * IP address. This attribute is only available from the Insights end point.
+     */
+    public Integer getAverageIncome() {
+        return this.averageIncome;
     }
 
     /**
@@ -65,6 +76,14 @@ final public class Location {
      */
     public Integer getMetroCode() {
         return this.metroCode;
+    }
+
+    /**
+     * @return The estimated population per square kilometer associated with the
+     * IP address. This attribute is only available from the Insights end point.
+     */
+    public Integer getPopulationDensity() {
+        return this.populationDensity;
     }
 
     /**

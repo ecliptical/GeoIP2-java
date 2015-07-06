@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * This record is returned by all the end points.
  * </p>
  */
-final public class Traits {
+public final class Traits {
     @JsonProperty("autonomous_system_number")
     private Integer autonomousSystemNumber;
 
@@ -37,10 +37,6 @@ final public class Traits {
 
     @JsonProperty("user_type")
     private String userType;
-
-    public Traits() {
-        // Empty traits object
-    }
 
     /**
      * @return The <a
@@ -139,7 +135,12 @@ final public class Traits {
      * returned by all end points.
      * @see <a href="http://dev.maxmind.com/faq/geoip#anonproxy">MaxMind's GeoIP
      * FAQ</a>
+     *
+     * @deprecated use our
+     * <a href="https://www.maxmind.com/en/geoip2-anonymous-ip-database">GeoIP2
+     * Anonymous IP database</a> instead.
      */
+    @Deprecated
     public boolean isAnonymousProxy() {
         return this.anonymousProxy;
     }
@@ -147,7 +148,12 @@ final public class Traits {
     /**
      * @return This is true if the IP belong to a satellite internet provider.
      * This attribute is returned by all end points.
+     *
+     * @deprecated use our
+     * <a href="https://www.maxmind.com/en/geoip2-anonymous-ip-database">GeoIP2
+     * Anonymous IP database</a> instead.
      */
+    @Deprecated
     public boolean isSatelliteProvider() {
         return this.satelliteProvider;
     }

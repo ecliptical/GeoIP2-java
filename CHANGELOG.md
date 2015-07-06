@@ -1,6 +1,28 @@
 CHANGELOG
 =========
 
+2.3.0 (2015-06-29)
+------------------
+
+* Add support for the `average_income` and `population_density` fields.
+* The `isAnonymousProxy()` and `isSatelliteProvider()` methods on
+  `com.maxmind.geoip2.record.Traits` have been deprecated. Please use our
+  [GeoIP2 Anonymous IP database](https://www.maxmind.com/en/geoip2-anonymous-
+  ip-database) to determine whether an IP address is used by an anonymizing
+  service.
+
+2.2.0 (2015-04-24)
+------------------
+
+* A `DatabaseProvider` interface has been added to facilitate mocking of
+  `DatabaseReader`. Pull request by Yonatan Most. GitHub #34.
+* A `getLeastSpecificSubdivision()` method has been added to the
+  `CityResponse` and `InsightsResponse` model classes. This returns the
+  least specific subdivision for the location, e.g., England for Oxford,
+  GB. Pull request by Daniel Kaneider. GitHub #35.
+* The `InsightsResponse` and `Location` classes are no longer declared final.
+* `AbstractResponse` is now declared `abstract`.
+
 2.1.0 (2014-11-06)
 ------------------
 

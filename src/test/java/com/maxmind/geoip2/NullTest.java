@@ -25,7 +25,7 @@ public class NullTest {
             "abcdef123456").testTransport(this.transport).build();
 
     @Test
-    public void testDefaults() throws IOException, GeoIp2Exception {
+    public void testDefaults() throws Exception {
         InsightsResponse insights = this.client.insights(InetAddress
                 .getByName("1.2.3.13"));
 
@@ -73,6 +73,11 @@ public class NullTest {
         assertNotNull(subdiv);
         assertNull(subdiv.getIsoCode());
         assertNull(subdiv.getConfidence());
+
+        Subdivision leastSpecificSubdiv = insights.getLeastSpecificSubdivision();
+        assertNotNull(leastSpecificSubdiv);
+        assertNull(leastSpecificSubdiv.getIsoCode());
+        assertNull(leastSpecificSubdiv.getConfidence());
 
         Traits traits = insights.getTraits();
         assertNotNull(traits);

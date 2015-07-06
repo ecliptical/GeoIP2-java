@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -26,9 +26,9 @@ import com.maxmind.geoip2.model.IspResponse;
 
 /**
  * Instances of this class provide a reader for the GeoIP2 database format. IP
- * addresses can be looked up using the <code>get</code> method.
+ * addresses can be looked up using the {@code get} method.
  */
-public class DatabaseReader implements GeoIp2Provider, Closeable {
+public class DatabaseReader implements DatabaseProvider, Closeable {
 
 	private final Reader reader;
 
@@ -55,26 +55,26 @@ public class DatabaseReader implements GeoIp2Provider, Closeable {
 		this.om.setInjectableValues(inject);
 	}
 
-	/**
-	 * <p>
-	 * Constructs a Builder for the DatabaseReader. The file passed to it must
-	 * be a valid GeoIP2 database file.
-	 * </p>
-	 * <p>
-	 * <code>Builder</code> creates instances of <code>DatabaseReader</code>
-	 * from values set by the methods.
-	 * </p>
-	 * <p>
-	 * Only the values set in the <code>Builder</code> constructor are required.
-	 * </p>
-	 */
-	public final static class Builder {
-		final File database;
-		final InputStream stream;
+    /**
+     * <p>
+     * Constructs a Builder for the DatabaseReader. The file passed to it must
+     * be a valid GeoIP2 database file.
+     * </p>
+     * <p>
+     * {@code Builder} creates instances of {@code DatabaseReader}
+     * from values set by the methods.
+     * </p>
+     * <p>
+     * Only the values set in the {@code Builder} constructor are required.
+     * </p>
+     */
+    public static final class Builder {
+        final File database;
+        final InputStream stream;
 		int streamLength;
 
-		List<String> locales = Arrays.asList("en");
-		FileMode mode = FileMode.MEMORY_MAPPED;
+        List<String> locales = Collections.singletonList("en");
+        FileMode mode = FileMode.MEMORY_MAPPED;
 
 		/**
 		 * @param stream the stream containing the GeoIP2 database to use.
@@ -102,36 +102,36 @@ public class DatabaseReader implements GeoIp2Provider, Closeable {
 			return this;
 		}
 
-		/**
-		 * @param val The file mode used to open the GeoIP2 database
-		 * @return Builder object
-		 * @throws java.lang.IllegalArgumentException if you initialized the Builder with a URL, which uses
-		 *                                            {@link FileMode#MEMORY}, but you provided a different
-		 *                                            FileMode to this method.
-		 */
-		public Builder fileMode(FileMode val) {
-			if (this.stream != null && !FileMode.MEMORY.equals(val)) {
-				throw new IllegalArgumentException(
-						"Only FileMode.MEMORY is supported when using an InputStream.");
-			}
-			this.mode = val;
-			return this;
-		}
+        /**
+         * @param val The file mode used to open the GeoIP2 database
+         * @return Builder object
+         * @throws java.lang.IllegalArgumentException if you initialized the Builder with a URL, which uses
+         *                                            {@link FileMode#MEMORY}, but you provided a different
+         *                                            FileMode to this method.
+         */
+        public Builder fileMode(FileMode val) {
+            if (this.stream != null && FileMode.MEMORY != val) {
+                throw new IllegalArgumentException(
+                        "Only FileMode.MEMORY is supported when using an InputStream.");
+            }
+            this.mode = val;
+            return this;
+        }
 
 		public Builder streamLength(int length) {
 			this.streamLength = length;
 			return this;
 		}
 
-		/**
-		 * @return an instance of <code>DatabaseReader</code> created from the
-		 * fields set on this builder.
-		 * @throws IOException if there is an error reading the database
-		 */
-		public DatabaseReader build() throws IOException {
-			return new DatabaseReader(this);
-		}
-	}
+        /**
+         * @return an instance of {@code DatabaseReader} created from the
+         * fields set on this builder.
+         * @throws IOException if there is an error reading the database
+         */
+        public DatabaseReader build() throws IOException {
+            return new DatabaseReader(this);
+        }
+    }
 
 	/**
 	 * @param ipAddress IPv4 or IPv6 address to lookup.
@@ -174,24 +174,24 @@ public class DatabaseReader implements GeoIp2Provider, Closeable {
 		return this.om.treeToValue(node, cls);
 	}
 
-	/**
-	 * <p>
-	 * Closes the database.
-	 * </p>
-	 * <p>
-	 * If you are using <code>FileMode.MEMORY_MAPPED</code>, this will
-	 * <em>not</em> unmap the underlying file due to a limitation in Java's
-	 * <code>MappedByteBuffer</code>. It will however set the reference to
-	 * the buffer to <code>null</code>, allowing the garbage collector to
-	 * collect it.
-	 * </p>
-	 *
-	 * @throws IOException if an I/O error occurs.
-	 */
-	@Override
-	public void close() throws IOException {
-		this.reader.close();
-	}
+    /**
+     * <p>
+     * Closes the database.
+     * </p>
+     * <p>
+     * If you are using {@code FileMode.MEMORY_MAPPED}, this will
+     * <em>not</em> unmap the underlying file due to a limitation in Java's
+     * {@code MappedByteBuffer}. It will however set the reference to
+     * the buffer to {@code null}, allowing the garbage collector to
+     * collect it.
+     * </p>
+     *
+     * @throws IOException if an I/O error occurs.
+     */
+    @Override
+    public void close() throws IOException {
+        this.reader.close();
+    }
 
 	@Override
 	public CountryResponse country(InetAddress ipAddress) throws IOException,
@@ -205,59 +205,63 @@ public class DatabaseReader implements GeoIp2Provider, Closeable {
 		return this.get(ipAddress, CityResponse.class, true, "City");
 	}
 
-	/**
-	 * Look up an IP address in a GeoIP2 Anonymous IP.
-	 *
-	 * @param ipAddress IPv4 or IPv6 address to lookup.
-	 * @return a AnonymousIpResponse for the requested IP address.
-	 * @throws GeoIp2Exception if there is an error looking up the IP
-	 * @throws IOException     if there is an IO error
-	 */
-	public AnonymousIpResponse anonymousIp(InetAddress ipAddress) throws IOException,
-	GeoIp2Exception {
-		return this.get(ipAddress, AnonymousIpResponse.class, false, "GeoIP2-Anonymous-IP");
-	}
+    /**
+     * Look up an IP address in a GeoIP2 Anonymous IP.
+     *
+     * @param ipAddress IPv4 or IPv6 address to lookup.
+     * @return a AnonymousIpResponse for the requested IP address.
+     * @throws GeoIp2Exception if there is an error looking up the IP
+     * @throws IOException     if there is an IO error
+     */
+    @Override
+    public AnonymousIpResponse anonymousIp(InetAddress ipAddress) throws IOException,
+            GeoIp2Exception {
+        return this.get(ipAddress, AnonymousIpResponse.class, false, "GeoIP2-Anonymous-IP");
+    }
 
-	/**
-	 * Look up an IP address in a GeoIP2 Connection Type database.
-	 *
-	 * @param ipAddress IPv4 or IPv6 address to lookup.
-	 * @return a ConnectTypeResponse for the requested IP address.
-	 * @throws GeoIp2Exception if there is an error looking up the IP
-	 * @throws IOException     if there is an IO error
-	 */
-	public ConnectionTypeResponse connectionType(InetAddress ipAddress)
-			throws IOException, GeoIp2Exception {
-		return this.get(ipAddress, ConnectionTypeResponse.class, false,
-				"GeoIP2-Connection-Type");
-	}
+    /**
+     * Look up an IP address in a GeoIP2 Connection Type database.
+     *
+     * @param ipAddress IPv4 or IPv6 address to lookup.
+     * @return a ConnectTypeResponse for the requested IP address.
+     * @throws GeoIp2Exception if there is an error looking up the IP
+     * @throws IOException     if there is an IO error
+     */
+    @Override
+    public ConnectionTypeResponse connectionType(InetAddress ipAddress)
+            throws IOException, GeoIp2Exception {
+        return this.get(ipAddress, ConnectionTypeResponse.class, false,
+                "GeoIP2-Connection-Type");
+    }
 
-	/**
-	 * Look up an IP address in a GeoIP2 Domain database.
-	 *
-	 * @param ipAddress IPv4 or IPv6 address to lookup.
-	 * @return a DomainResponse for the requested IP address.
-	 * @throws GeoIp2Exception if there is an error looking up the IP
-	 * @throws IOException     if there is an IO error
-	 */
-	public DomainResponse domain(InetAddress ipAddress) throws IOException,
-	GeoIp2Exception {
-		return this
-				.get(ipAddress, DomainResponse.class, false, "GeoIP2-Domain");
-	}
+    /**
+     * Look up an IP address in a GeoIP2 Domain database.
+     *
+     * @param ipAddress IPv4 or IPv6 address to lookup.
+     * @return a DomainResponse for the requested IP address.
+     * @throws GeoIp2Exception if there is an error looking up the IP
+     * @throws IOException     if there is an IO error
+     */
+    @Override
+    public DomainResponse domain(InetAddress ipAddress) throws IOException,
+            GeoIp2Exception {
+        return this
+                .get(ipAddress, DomainResponse.class, false, "GeoIP2-Domain");
+    }
 
-	/**
-	 * Look up an IP address in a GeoIP2 ISP database.
-	 *
-	 * @param ipAddress IPv4 or IPv6 address to lookup.
-	 * @return an IspResponse for the requested IP address.
-	 * @throws GeoIp2Exception if there is an error looking up the IP
-	 * @throws IOException     if there is an IO error
-	 */
-	public IspResponse isp(InetAddress ipAddress) throws IOException,
-	GeoIp2Exception {
-		return this.get(ipAddress, IspResponse.class, false, "GeoIP2-ISP");
-	}
+    /**
+     * Look up an IP address in a GeoIP2 ISP database.
+     *
+     * @param ipAddress IPv4 or IPv6 address to lookup.
+     * @return an IspResponse for the requested IP address.
+     * @throws GeoIp2Exception if there is an error looking up the IP
+     * @throws IOException     if there is an IO error
+     */
+    @Override
+    public IspResponse isp(InetAddress ipAddress) throws IOException,
+            GeoIp2Exception {
+        return this.get(ipAddress, IspResponse.class, false, "GeoIP2-ISP");
+    }
 
 	/**
 	 * @return the metadata for the open MaxMind DB file.
